@@ -11,17 +11,43 @@ local function is_mouse_mode()
 	return vim.o.mouse ~= ""
 end
 
--- Function to enter mouse mode
-local function enter_mouse_mode()
-	vim.opt.mouse = "a"
-	vim.notify("MOUSE MODE", vim.log.levels.INFO, { title = "Mouser" })
-end
-
 -- Function to exit mouse mode
 local function exit_mouse_mode()
 	if is_mouse_mode() then
 		vim.opt.mouse = ""
 		vim.notify("Normal Mode", vim.log.levels.INFO, { title = "Mouser" })
+
+		-- Clear autocmds and temporary keymaps
+		pcall(vim.api.nvim_del_augroup_by_name, "MouserAutoDisable")
+		vim.api.nvim_buf_clear_namespace(0, -1, 0, -1) -- Clear buffer-local maps
+	end
+end
+
+-- Function to enter mouse mode
+local function enter_mouse_mode()
+	vim.opt.mouse = "a"
+	vim.notify("MOUSE MODE", vim.log.levels.INFO, { title = "Mouser" })
+
+	-- Set up autocmd for mode changes
+	local group = vim.api.nvim_create_augroup("MouserAutoDisable", { clear = true })
+	vim.api.nvim_create_autocmd({
+		"InsertEnter",
+		"CmdlineEnter",
+		"TermEnter",
+		"VisualEnter",
+	}, {
+		group = group,
+		callback = exit_mouse_mode,
+	})
+
+	-- Temporarily map common movement keys to exit mouse mode
+	local movement_keys = { "h", "j", "k", "l", "w", "b", "e", "gg", "G", "0", "$" }
+	for _, key in ipairs(movement_keys) do
+		vim.keymap.set("n", key, function()
+			exit_mouse_mode()
+			-- Execute the original key after exiting mouse mode
+			vim.api.nvim_feedkeys(key, "n", false)
+		end, { buffer = true })
 	end
 end
 
