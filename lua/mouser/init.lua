@@ -32,9 +32,10 @@ local function enter_mouse_mode()
     callback = exit_mouse_mode,
   })
   
-  -- Exit on any keypress using vim.on_key
+  -- Exit on any keypress using vim.on_key, but ignore mouse events
   local key_handler = vim.on_key(function(key)
-    if key ~= "" then  -- Ignore empty keys
+    -- Ignore mouse events (scroll wheel, clicks, etc.)
+    if key ~= "" and not key:match("^<.*Mouse.*>") and not key:match("^<ScrollWheel") then
       exit_mouse_mode()
     end
   end)
