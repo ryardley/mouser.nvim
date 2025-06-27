@@ -40,10 +40,10 @@ function M.setup(opts)
 	-- Merge user config with defaults
 	config = vim.tbl_deep_extend("force", config, opts or {})
 
-	-- Disable mouse by default
+	-- ALWAYS disable mouse by default on setup
 	vim.opt.mouse = ""
 
-	-- Set up the key mappings globally
+	-- Set up the key mappings
 	vim.keymap.set("n", config.enter_key, enter_mouse_mode, {
 		desc = "Enter mouse mode",
 	})
