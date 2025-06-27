@@ -14,9 +14,6 @@ end
 local function exit_mouse_mode()
   if is_mouse_mode() then
     vim.opt.mouse = ""
-    -- Trigger custom event to clean up key handler
-    vim.api.nvim_exec_autocmds("User", { pattern = "MouserExit" })
-    -- Clear autocmds
     pcall(vim.api.nvim_del_augroup_by_name, "MouserAutoDisable")
   end
 end
@@ -25,30 +22,25 @@ end
 local function enter_mouse_mode()
   vim.opt.mouse = "a"
   
-  -- Exit on any mode change
+  -- Exit on mode changes or cursor movement (but allow mouse events)
   local group = vim.api.nvim_create_augroup("MouserAutoDisable", { clear = true })
+  
+  -- Exit on mode change
   vim.api.nvim_create_autocmd("ModeChanged", {
     group = group,
     callback = exit_mouse_mode,
   })
   
-  -- Exit on any keypress using vim.on_key, but ignore mouse events
-  local key_handler = vim.on_key(function(key)
-    -- Ignore mouse events (scroll wheel, clicks, etc.)
-    if key ~= "" and not key:match("^<.*Mouse.*>") and not key:match("^<ScrollWheel") then
-      exit_mouse_mode()
-    end
-  end)
-  
-  -- Store the handler to remove it later
-  vim.api.nvim_create_autocmd("User", {
+  -- Exit on cursor movement (which happens after commands like 10j complete)
+  vim.api.nvim_create_autocmd("CursorMoved", {
     group = group,
-    pattern = "MouserExit",
-    callback = function()
-      if key_handler then
-        vim.on_key(nil, key_handler)
-      end
-    end,
+    callback = exit_mouse_mode,
+  })
+  
+  -- Exit on text changes
+  vim.api.nvim_create_autocmd({"TextChanged", "TextChangedI"}, {
+    group = group,
+    callback = exit_mouse_mode,
   })
 end
 
