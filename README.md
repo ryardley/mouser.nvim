@@ -19,6 +19,24 @@ return {
 }
 ```
 
+## Usage
+
+With the plugin installed the mouse will be disabled until you press the `m` key in normal mode. You can then scroll or click to a position. Whatever you do after that should escape mouse mode and disable the mouse.
+
+## Configuration
+
+You can set your own mouse key like this:
+
+```lua
+return {
+  "ryardley/mouser.nvim",
+  config = true,
+  keys = {
+    { "<leader>m", desc = "Enter mouse mode" },
+  },
+}
+```
+
 Use with lualine add as a dependency and use the mouser_status global var.
 
 ```lua
@@ -40,23 +58,5 @@ return {
       },
     })
   end,
-}
-```
-
-## Usage
-
-With the plugin installed the mouse will be disabled until you press the `m` key in normal mode. You can then scroll or click to a position. Whatever you do after that should escape mouse ode and disable the mouse.
-
-## Configuration
-
-You can set your own mouse key like this:
-
-```lua
-return {
-  "ryardley/mouser.nvim",
-  config = true,
-  keys = {
-    { "<leader>m", desc = "Enter mouse mode" },
-  },
 }
 ```
