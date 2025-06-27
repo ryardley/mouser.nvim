@@ -24,6 +24,15 @@ function M.setup(opts)
   -- Create highlight group for mouse status
   vim.api.nvim_set_hl(0, "MouserStatus", { bg = "white", fg = "black", bold = true })
   
+  -- Exit mouse mode on mode change
+  vim.api.nvim_create_autocmd("ModeChanged", {
+    callback = function()
+      if vim.o.mouse ~= "" then
+        exit_mouse_mode()
+      end
+    end,
+  })
+  
   _G.mouser_status = function()
     if vim.o.mouse ~= "" then
       return "%#MouserStatus# MOUSE %*"
