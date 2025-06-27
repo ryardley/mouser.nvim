@@ -15,7 +15,6 @@ end
 local function exit_mouse_mode()
   if is_mouse_mode() then
     vim.opt.mouse = ""
-    vim.notify("Normal Mode", vim.log.levels.INFO, { title = "Mouser" })
     -- Clear autocmds
     pcall(vim.api.nvim_del_augroup_by_name, "MouserAutoDisable")
   end
@@ -24,7 +23,6 @@ end
 -- Function to enter mouse mode
 local function enter_mouse_mode()
   vim.opt.mouse = "a"
-  vim.notify("MOUSE MODE", vim.log.levels.INFO, { title = "Mouser" })
 
   -- Exit on any mode change or common movement keys
   local group = vim.api.nvim_create_augroup("MouserAutoDisable", { clear = true })
